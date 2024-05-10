@@ -1,5 +1,6 @@
 package com.example.api.service;
 
+import com.example.api.repository.CouponCountRepository;
 import com.example.api.repository.CouponRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ class ApplyServiceTest {
 
     @Autowired
     private CouponRepository couponRepository;
+
+    @Autowired
+    CouponCountRepository couponCountRepository;
 
     @Test
     public void applyOnlyOnce(){
@@ -61,6 +65,8 @@ class ApplyServiceTest {
         long count = couponRepository.count();
 
         assertThat(count).isEqualTo(100);
+
+        couponCountRepository.flushAll();
     }
 
 }
