@@ -66,7 +66,7 @@ class ApplyServiceTest {
 
         assertThat(count).isEqualTo(100);
 
-        couponCountRepository.flushAll();
+        //couponCountRepository.flushAll();
     }
 
 }
