@@ -71,4 +71,39 @@ class ApplyServiceTest {
         //couponCountRepository.flushAll();
     }
 
+    @Test
+    public void onlyOneCouponIssuedPerPerson() throws InterruptedException {
+        //동시에 여러 개의 요청을 보내야 되므로 멀티 쓰레드를 사용 (1000개의 요청으로 가정)
+        int threadCount = 1000;
+
+        //ExecutorService : 병렬 작업을 간단하게 할 수 있게 도와주는 Java의 API
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        //모든 요청이 끝날 때까지 기다려야 하므로 CountDownLatch를 사용
+        //CountDownLatch : 다른 Thread에서 수행하는 작업을 기다리도록 도와주는 클래스
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        for(int i=0; i<threadCount; i++){
+            long userId = i;
+
+            executorService.submit(() -> {
+                try {
+                    //1이라는 유저가 1000번의 요청을 보내지만 1개의 쿠폰만 발급이 되어야 한다.
+                    //applyService.applyCoupon(1L);
+                    applyService.applyCoupon(userId);
+                }
+                finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        Thread.sleep(10000);
+
+        long count = couponRepository.count();
+
+        assertThat(count).isEqualTo(100);
+    }
+
 }
